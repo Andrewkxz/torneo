@@ -22,6 +22,7 @@ public class Torneo {
     private final TipoGenero tipoGenero;
     private final Collection<Participante> participantes;
     private final CaracterTorneo caracter;
+    private final Collection<Juez> jueces;
 
     public Torneo(String nombre, LocalDate fechaInicio,
             LocalDate fechaInicioInscripciones,
@@ -50,6 +51,7 @@ public class Torneo {
         this.tipoGenero = tipoGenero;
         this.participantes = new LinkedList<>();
         this.caracter = Objects.requireNonNull(caracter,"El carácter del torneo es requerido");
+        this.jueces = new LinkedList<>();
     }
 
     public String getNombre() {
@@ -228,4 +230,41 @@ public class Torneo {
         var edadAlInicioTorneo = jugador.calcularEdad(fechaInicio);
         ASSERTION.assertion( limiteEdad == 0 || limiteEdad >= edadAlInicioTorneo , "No se pueden registrar jugadores que excedan el limite de edad del torneo"); 
     }
+
+    /**
+     * permite registrar un juez en el torneo
+     * @param juez Juez a ser registrado.
+     */
+    public void registrarJuez(Juez juez){
+        validarJuezExiste(juez);
+        jueces.add(juez);
+    }
+
+    /**
+     * Valida que no exista un juez registrado con la misma licencia, en caso de haberlo genera una assertion error.
+     * @param juez
+     */
+    private void validarJuezExiste (Juez juez){
+        boolean existeJuez = buscarJuezPorLicencia(juez.getLicencia()).isPresent();
+        ASSERTION.assertion( !existeJuez, "El juez ya está registrado");
+    }
+
+    /**
+     * Permite obtener una copia no modificable de la lista de los jueces registrados.
+     * @return Collection<Juez> no modificable de los jueces registrados en el torneo.
+     */
+    public Collection<Juez> getJueces(){
+        return Collections.unmodifiableCollection(jueces);
+    }
+
+    /**
+     * Permite buscar un juez por su licencia entre los jueces registrados en el torneo.
+     * @param licencia Licencia del juez que se está buscando.
+     * @return un Optional<Juez> con el juez cuya licencia sea igual a la licencia buscada, o un Optional vacío en caso de no encontrar un juez con la licencia dada.
+     */
+    public Optional<Juez> buscarJuezPorLicencia(String licencia){
+        Predicate<Juez> condicion = juez -> juez.getLicencia().equals(licencia);
+        return jueces.stream().filter(condicion).findAny();
+    }
+
 }

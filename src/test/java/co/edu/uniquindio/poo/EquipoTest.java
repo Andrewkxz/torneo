@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import co.edu.uniquindio.poo.torneoDeportivo.CaracterTorneo;
 import co.edu.uniquindio.poo.torneoDeportivo.Equipo;
+import co.edu.uniquindio.poo.torneoDeportivo.Juez;
 import co.edu.uniquindio.poo.torneoDeportivo.Persona;
 import co.edu.uniquindio.poo.torneoDeportivo.TipoGenero;
 import co.edu.uniquindio.poo.torneoDeportivo.TipoTorneo;
@@ -36,9 +37,12 @@ public class EquipoTest {
 
         var representante = new Persona("Robinson", "Pulgarin", "rpulgarin@email.com", "6067359300");
 
+        var juez = new Juez("123456789", "Andrés", "Rodríguez", "jaidera.melor@uqvirtual.edu.co", "123456789");
+
         var equipo = new Equipo("Uniquindio", representante);
 
         torneo.registrarParticipante(equipo);
+        torneo.registrarJuez(juez);
 
         // Recuperación y verificación de datos
         assertTrue(torneo.getParticipantes().contains(equipo));
@@ -60,9 +64,12 @@ public class EquipoTest {
 
         var representante = new Persona("Robinson", "Pulgarin", "rpulgarin@email.com", "6067359300");
 
+        var juez = new Juez("123456789", "Andrés", "Rodríguez", "jaidera.melor@uqvirtual.edu.co", "123456789");
+
         var equipo = new Equipo("Uniquindio", representante);
         var equipo2 = new Equipo("Uniquindio", representante);
         torneo.registrarParticipante(equipo);
+        torneo.registrarJuez(juez);
 
         assertThrows(Throwable.class, ()-> torneo.registrarParticipante(equipo2));
         
@@ -79,13 +86,16 @@ public class EquipoTest {
         // Almacenar los datos de prueba Torneo{Copa Mundo\|fechaActual+ 1mes\| fechaActual - 15 días\|fechaActual-1 días\|24\|0\|0\|LOCAL|GRUPAL}  Equipo{Uniquindio} Representante{Robinson,Pulgarin,rpulgarin@email.com,6067359300}
 
         
-        Torneo torneo = new Torneo("Copa Mundo", LocalDate.now().plusMonths(1), LocalDate.now().minusDays(15), LocalDate.now().plusDays(1), (byte)24, (byte)0, 0,TipoTorneo.LOCAL,TipoGenero.FEMENINO,CaracterTorneo.GRUPAL);
+        Torneo torneo = new Torneo("Copa Mundo", LocalDate.now().plusMonths(1), LocalDate.now().minusDays(15), LocalDate.now().minusDays(1), (byte)24, (byte)0, 0,TipoTorneo.LOCAL,TipoGenero.FEMENINO,CaracterTorneo.GRUPAL);
 
         var representante = new Persona("Robinson", "Pulgarin", "rpulgarin@email.com", "6067359300");
+
+        var juez = new Juez("123456789", "Andrés", "Rodríguez", "jaidera.melor@uqvirtual.edu.co", "123456789");
 
         var equipo = new Equipo("Uniquindio", representante);
 
         assertThrows(Throwable.class, ()-> torneo.registrarParticipante(equipo));
+        torneo.registrarJuez(juez);
         
         LOG.info("Fin de prueba inscripcionCerrada...");
     }
@@ -100,13 +110,16 @@ public class EquipoTest {
         // Almacenar los datos de prueba Torneo{Copa Mundo\|fechaActual+ 1mes\| fechaActual + 1 día\|fechaActual+15 días\|24\|0\|0\|LOCAL|GRUPAL}  Equipo{Uniquindio} Representante{Robinson,Pulgarin,rpulgarin@email.com,6067359300}
 
         
-        Torneo torneo = new Torneo("Copa Mundo", LocalDate.now().plusMonths(1), LocalDate.now().minusDays(1), LocalDate.now().plusDays(15), (byte)24, (byte)0, 0,TipoTorneo.LOCAL,TipoGenero.FEMENINO,CaracterTorneo.GRUPAL);
+        Torneo torneo = new Torneo("Copa Mundo", LocalDate.now().plusMonths(1), LocalDate.now().plusDays(1), LocalDate.now().plusDays(15), (byte)24, (byte)0, 0,TipoTorneo.LOCAL,TipoGenero.FEMENINO,CaracterTorneo.GRUPAL);
 
         var representante = new Persona("Robinson", "Pulgarin", "rpulgarin@email.com", "6067359300");
+
+        var juez = new Juez("123456789", "Andrés", "Rodríguez", "jaidera.melor@uqvirtual.edu.co", "123456789");
 
         var equipo = new Equipo("Uniquindio", representante);
 
         assertThrows(Throwable.class, ()-> torneo.registrarParticipante(equipo));
+        torneo.registrarJuez(juez);
         
         LOG.info("Fin de prueba inscripcionNoAbierta...");
     }

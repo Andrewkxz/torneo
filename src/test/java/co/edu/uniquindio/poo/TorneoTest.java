@@ -38,6 +38,8 @@ public class TorneoTest {
         assertEquals((byte)0,torneo.getLimiteEdad());
         assertEquals(0,torneo.getValorInscripcion());
         assertEquals(TipoTorneo.LOCAL,torneo.getTipoTorneo());
+        assertEquals(TipoGenero.FEMENINO, torneo.getTipoGenero());
+        assertEquals(CaracterTorneo.GRUPAL, torneo.getCaracter());
         LOG.info("Fin de prueba datos completos...");
     }
 

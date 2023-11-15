@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import co.edu.uniquindio.poo.torneoDeportivo.CaracterTorneo;
 import co.edu.uniquindio.poo.torneoDeportivo.Equipo;
+import co.edu.uniquindio.poo.torneoDeportivo.Juez;
 import co.edu.uniquindio.poo.torneoDeportivo.Jugador;
 import co.edu.uniquindio.poo.torneoDeportivo.Persona;
 import co.edu.uniquindio.poo.torneoDeportivo.TipoGenero;
@@ -107,11 +108,11 @@ public class JugadorTest {
         // Almacenar los datos de prueba Torneo{Copa Mundo\|fechaActual+ 1mes\| fechaActual - 15 días\|fechaActual+15 días\|24\|18\|0\|LOCAL|GRUPAL}  Equipo{Uniquindio} Representante{Robinson,Pulgarin,rpulgarin@email.com,6067359300}, Jugador {Christian,Candela,chrcandela@email.com,6067431234, fechaActual - 21 años}
 
         
-        Torneo torneo = new Torneo("Copa Mundo", LocalDate.now().plusMonths(1), LocalDate.now().minusDays(1), LocalDate.now().plusDays(15), (byte)24, (byte)0, 0,TipoTorneo.LOCAL,TipoGenero.FEMENINO,CaracterTorneo.GRUPAL);
+        Torneo torneo = new Torneo("Copa Mundo", LocalDate.now().plusMonths(1), LocalDate.now().minusDays(15), LocalDate.now().plusDays(15), (byte)24, (byte)18, 0,TipoTorneo.LOCAL,TipoGenero.FEMENINO,CaracterTorneo.GRUPAL);
 
         var representante = new Persona("Robinson", "Pulgarin", "rpulgarin@email.com", "6067359300");
         var equipo = new Equipo("Uniquindio", representante);
-        var jugador = new Jugador("Christian", "Candela", "chrcandela@email.com", "6067431234",TipoGenero.MASCULINO,LocalDate.now().minusYears(15));
+        var jugador = new Jugador("Christian", "Candela", "chrcandela@email.com", "6067431234",TipoGenero.MASCULINO,LocalDate.now().minusYears(21));
 
         torneo.registrarParticipante(equipo);
         assertThrows(Throwable.class,()->torneo.registrarJugador("Uniquindio",jugador));
@@ -132,7 +133,7 @@ public class JugadorTest {
         // Almacenar los datos de prueba Torneo{Copa Mundo\|fechaActual+ 1mes\| fechaActual - 15 días\|fechaActual-1 día\|24\|18\|0\|LOCAL|GRUPAL}  Equipo{Uniquindio} Representante{Robinson,Pulgarin,rpulgarin@email.com,6067359300} Jugador {Christian,Candela,chrcandela@email.com,6067431234, fechaActual - 15 años}
 
         
-        Torneo torneo = new Torneo("Copa Mundo", LocalDate.now().plusMonths(1), LocalDate.now().minusDays(1), LocalDate.now().plusDays(15), (byte)24, (byte)0, 0,TipoTorneo.LOCAL,TipoGenero.FEMENINO,CaracterTorneo.GRUPAL);
+        Torneo torneo = new Torneo("Copa Mundo", LocalDate.now().plusMonths(1), LocalDate.now().minusDays(15), LocalDate.now().plusDays(1), (byte)24, (byte)18, 0,TipoTorneo.LOCAL,TipoGenero.FEMENINO,CaracterTorneo.GRUPAL);
         var representante = new Persona("Robinson", "Pulgarin", "rpulgarin@email.com", "6067359300");
         var equipo = new Equipo("Uniquindio", representante);
         var jugador = new Jugador("Christian", "Candela", "chrcandela@email.com", "6067431234",TipoGenero.MASCULINO,LocalDate.now().minusYears(15));
@@ -192,6 +193,14 @@ public class JugadorTest {
         // Recuperación y verificación de datos
         
         LOG.info("Fin de prueba registrarJugadoresRepetidosTorneo...");
+    }
+
+    @Test
+    public void registrarJugadorGeneroMixto() {
+        LOG.info("Inicio de prueba registrarJugadorGeneroMixto...");
+        //La prueba pasa ya que lanza el assert de que el genero del jugador debe ser MASCULINO o FEMENINO pero no MIXTO, Jugador {Christian,Candela,chrcandela@email.com,6067431234, tipoGenero - MIXTO, fechaActual - 15 años}
+        assertThrows(Throwable.class, ()-> new Jugador("Christian", "Candela", "chrcandela@email.com", "6067431234",TipoGenero.MIXTO,LocalDate.now().minusYears(15)));
+        LOG.info("Fin de prueba registrarGeneroMixto...");
     }
     
 
