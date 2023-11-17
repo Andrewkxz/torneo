@@ -6,9 +6,11 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Torneo {
     private final String nombre;
@@ -23,6 +25,7 @@ public class Torneo {
     private final Collection<Participante> participantes;
     private final CaracterTorneo caracter;
     private final Collection<Juez> jueces;
+    private Collection<Enfrentamiento> enfrentamientos;
 
     public Torneo(String nombre, LocalDate fechaInicio,
             LocalDate fechaInicioInscripciones,
@@ -52,6 +55,7 @@ public class Torneo {
         this.participantes = new LinkedList<>();
         this.caracter = Objects.requireNonNull(caracter,"El carácter del torneo es requerido");
         this.jueces = new LinkedList<>();
+        this.enfrentamientos = new LinkedList<>();
     }
 
     public String getNombre() {
@@ -267,4 +271,51 @@ public class Torneo {
         return jueces.stream().filter(condicion).findAny();
     }
 
+    /**
+    * Valida que las inscripciones del torneo estén abiertas, en caso de no estarlo genera un assertion error.
+    */
+    private void validarInscripcionesAbiertas() {
+        boolean inscripcionAbierta = fechaInicioInscripciones.isBefore(LocalDate.now()) && fechaCierreInscripciones.isAfter(LocalDate.now());
+        ASSERTION.assertion(inscripcionAbierta,"Las inscripciones no están abiertas");
+    }
+
+    /**
+    * Permite registrar un enfrentamiento en el torneo
+    * @param enfrentamiento Enfrentamiento a ser registrado
+    * @throws Se genera un error si ya existe un enfrentamiento registrado con el mismo nombre, 
+    * o si las inscripciones del torneo no están abiertas.
+     */
+    public void registrarEnfrentamiento(Enfrentamiento enfrentamiento) {
+        validarEnfrentamientoExiste(enfrentamiento);
+        validarInscripcionesAbiertas(); 
+
+        enfrentamientos.add(enfrentamiento);
+    }
+
+    /**
+    * Valida que no exista ya un enfrentamiento registrado con el mismo nombre, en caso de haberlo genera un assertion error.
+    */
+    private void validarEnfrentamientoExiste(Enfrentamiento enfrentamiento) {
+        boolean existeEnfrentamiento = buscarEnfrentamientoPorNombre(enfrentamiento).isPresent();
+        ASSERTION.assertion(!existeEnfrentamiento,"El enfrentamiento ya está registrado");
+    }
+
+    /**
+    * Permite obtener una copia no modificable de la lista de los enfrentamientos registrados.
+    * @return Collection<Enfrentamiento> no modificable de los enfrentamientos registrados en el torneo.
+    */
+    public Collection<Enfrentamiento> getEnfrentamientos(){
+        return Collections.unmodifiableCollection(enfrentamientos);
+    }
+
+    /**
+    * Permite buscar un enfrentamiento por su nombre entre los enfrentamientos registrados en el torneo.
+    * @param nombre Nombre del enfrentamiento que se está buscando
+    * @return Un Optional<Enfrentamiento> con el enfrentamiento cuyo nombre sea igual al nombre buscado, 
+    *         o un Optional vacío en caso de no encontrar un enfrentamiento con nombre igual al dado.
+    */
+    public Optional<Enfrentamiento> buscarEnfrentamientoPorNombre(Equipo equipo){
+        Predicate<Enfrentamiento> condicion = e -> e.getNombre().equals(enfrentamiento.getNombre());
+        return enfrentamientos.stream().filter(condicion).findAny();
+    }
 }
