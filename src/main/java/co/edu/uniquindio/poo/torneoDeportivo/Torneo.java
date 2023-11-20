@@ -2,15 +2,15 @@ package co.edu.uniquindio.poo.torneoDeportivo;
 
 import static co.edu.uniquindio.poo.torneoDeportivo.util.AssertionUtil.ASSERTION;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class Torneo {
     private final String nombre;
@@ -286,18 +286,16 @@ public class Torneo {
     * o si las inscripciones del torneo no están abiertas.
      */
     public void registrarEnfrentamiento(Enfrentamiento enfrentamiento) {
-        validarEnfrentamientoExiste(enfrentamiento);
-        validarInscripcionesAbiertas(); 
+        validarInscripcionesAbiertas();
+        ASSERTION.assertion(enfrentamiento.equipos().size() ==2, "Es requerido que se registren exactamente dos equipos en el enfrentamiento");
 
         enfrentamientos.add(enfrentamiento);
     }
 
-    /**
-    * Valida que no exista ya un enfrentamiento registrado con el mismo nombre, en caso de haberlo genera un assertion error.
-    */
-    private void validarEnfrentamientoExiste(Enfrentamiento enfrentamiento) {
-        boolean existeEnfrentamiento = buscarEnfrentamientoPorNombre(enfrentamiento).isPresent();
-        ASSERTION.assertion(!existeEnfrentamiento,"El enfrentamiento ya está registrado");
+
+
+    public boolean equipoEnEnfrentamiento(Equipo equipo, Enfrentamiento enfrentamiento){
+        return enfrentamiento.equipos().contains(equipo);
     }
 
     /**
@@ -308,14 +306,31 @@ public class Torneo {
         return Collections.unmodifiableCollection(enfrentamientos);
     }
 
+    public void estadoPartido(){
+        Collection<Enfrentamiento> enfrentamientos = getEnfrentamientos();
+        for (Enfrentamiento enfrentamiento : enfrentamientos){
+            LocalDateTime fechaPartido = enfrentamiento.fechaYhora();
+            LocalDateTime fechaActual = LocalDateTime.now();
+            if (fechaActual.isEqual(fechaPartido)){
+                enfrentamiento.actualizarEstado(EstadoEnfrentamiento.EN_JUEGO);
+            } else if (fechaActual.isAfter(fechaPartido) && Duration.between(fechaPartido, fechaActual).toMinutes() > 90){
+                enfrentamiento.actualizarEstado(EstadoEnfrentamiento.FINALIZADO);
+            } else if (fechaActual.isAfter(fechaPartido)){
+                enfrentamiento.actualizarEstado(EstadoEnfrentamiento.APLAZADO);
+            }
+        }
+    }
+
+
     /**
-    * Permite buscar un enfrentamiento por su nombre entre los enfrentamientos registrados en el torneo.
-    * @param nombre Nombre del enfrentamiento que se está buscando
+    * Permite buscar un enfrentamiento por el nombre del equipo entre los enfrentamientos registrados en el torneo.
+    * @param nombre Nombre del equipo que se está buscando
     * @return Un Optional<Enfrentamiento> con el enfrentamiento cuyo nombre sea igual al nombre buscado, 
     *         o un Optional vacío en caso de no encontrar un enfrentamiento con nombre igual al dado.
     */
     public Optional<Enfrentamiento> buscarEnfrentamientoPorNombre(Equipo equipo){
-        Predicate<Enfrentamiento> condicion = e -> e.getNombre().equals(enfrentamiento.getNombre());
+        Predicate<Enfrentamiento> condicion = e -> e.equipos().contains(equipo);
         return enfrentamientos.stream().filter(condicion).findAny();
     }
+
 }

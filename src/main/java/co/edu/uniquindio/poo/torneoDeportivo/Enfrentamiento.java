@@ -9,14 +9,38 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public record Enfrentamiento (String lugar, LocalDateTime fechaYhora, Collection<Equipo> equipos, Collection<EstadoEnfrentamiento> estadoEnfrentamientos){
-    public Enfrentamiento{
-    ASSERTION.assertion(lugar != null && !lugar.isBlank(), "El lugar es requerido");
-    ASSERTION.assertion(fechaYhora != null, "La fecha y hora son requeridas");
-    }
+public class Enfrentamiento {
+    private String lugar;
+    private LocalDateTime fechaYhora;
+    private String equipoLocal;
+    private String equipoVisitante;
+    private Juez juez;
+    private int golesLocal;
+    private int golesVisitante;
+    private EstadoEnfrentamiento estado;
+    private String ganador;
+    private String perdedor;
+    private String empate;
+    private Collection<Equipo> equipos;
+    
+    public Enfrentamiento (String lugar, LocalDateTime fechaYhora, Juez juez, String equipoLocal, String equipoVisitante, int golesLocal, int golesVisitante, EstadoEnfrentamiento estado){
+        this.lugar = lugar;
+        this.fechaYhora = fechaYhora;
+        this.juez = juez;
+        this.equipoLocal = equipoLocal;
+        this.equipoVisitante = equipoVisitante;
+        this.golesLocal = golesLocal;
+        this.golesVisitante = golesVisitante;
+        this.estado = estado;
+        this.equipos = new LinkedList<>();
+        ASSERTION.assertion(lugar != null && !lugar.isBlank(), "El lugar es requerido");
+        ASSERTION.assertion(fechaYhora != null, "La fecha y hora son requeridas");
+        ASSERTION.assertion(juez != null, "El juez es requerido");
+        ASSERTION.assertion(equipos.size()<2 || equipos.size()>2,"El partido comenzará cuando se registren dos equipos solamente");
+        if (equipos.size() == 2){
+        realizarEnfrentamiento();
+        }
 
-    public  Enfrentamiento(String lugar, LocalDateTime fechaYhora){
-        this(lugar,fechaYhora,new LinkedList<>(), new LinkedList<>());
     }
 
      /**
@@ -26,16 +50,34 @@ public record Enfrentamiento (String lugar, LocalDateTime fechaYhora, Collection
     public void registrarEquipo(Equipo equipo) {
         validarEquipoExiste(equipo);
         equipos.add(equipo);
-        if (equipos.size()==2){
+        if (equipos.size() == 2){
+            String [] nombreEquipos = equipos.stream().map(Equipo::getNombreCompleto).toArray(String[]::new);
+            equipoLocal = nombreEquipos[0];
+            equipoVisitante = nombreEquipos[1];
             realizarEnfrentamiento();
-        } else if (equipos.size()>2){
-            ASSERTION.assertion(equipos.size()>2,"No se puede registrar más de dos equipos en un enfrentamiento");
         }
-        ASSERTION.assertion(equipos.size()< 2, "Se requieren dos equipos para poder realizar el enfrentamiento");
+
     }
 
+    /**
+     * Realiza el enfrentamiento entre ambos equipos y guarda el equipo ganador y perdedor o si es empate.
+     */
     private void realizarEnfrentamiento(){
+
         System.out.println("Enfrentamiento realizado entre: " + equipos.stream().map(Equipo::getNombreCompleto).collect(Collectors.joining(" vs ")));
+
+        if (golesLocal > golesVisitante){
+            ganador = equipoLocal;
+            perdedor = equipoVisitante;
+            estado = EstadoEnfrentamiento.FINALIZADO;
+        } else if (golesLocal < golesVisitante){
+             ganador = equipoVisitante;
+             perdedor = equipoLocal;
+             estado = EstadoEnfrentamiento.FINALIZADO;
+        } else {
+            empate = "Empate";
+        }
+        System.out.println("Resultado: Ganador -> " + ganador + ", Perdedor -> " + perdedor + ", Estado -> " + estado);
     }
 
     /**
@@ -57,8 +99,56 @@ public record Enfrentamiento (String lugar, LocalDateTime fechaYhora, Collection
         ASSERTION.assertion( !existeEquipo,"El equipo ya esta registrado");
     }
 
+    public void actualizarEstado (EstadoEnfrentamiento estadoNuevo){
+        EstadoEnfrentamiento estado = estadoNuevo;
+        System.out.println("El estado del enfrentamiento ha sido actualizado satisfactoriamente a: " + estadoNuevo);
+        ASSERTION.assertion(estado != EstadoEnfrentamiento.FINALIZADO, "No se puede actualizar a un nuevo estado");
+    }
+
     public Collection<Equipo> equipos() {
         return equipos;
     }
+
+    public String lugar() {
+        return lugar;
+    }
+
+    public LocalDateTime fechaYhora() {
+        return fechaYhora;
+    }
+
+    public String equipoLocal() {
+        return equipoLocal;
+    }
+
+    public String equipoVisitante() {
+        return equipoVisitante;
+    }
+
+    public int golesLocal() {
+        return golesLocal;
+    }
+
+    public int golesVisitante() {
+        return golesVisitante;
+    }
+
+    public EstadoEnfrentamiento estado() {
+        return estado;
+        
+    }
+
+    public String ganador() {
+        return ganador;
+    }
+
+    public String perdedor() {
+        return perdedor;
+    }
+
+    public Juez getJuez() {
+        return juez;
+    }
+
 
 }
